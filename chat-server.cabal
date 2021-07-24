@@ -1,0 +1,141 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.4.
+--
+-- see: https://github.com/sol/hpack
+
+name:           chat-server
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/Disco-Dave/chat-server#readme>
+homepage:       https://github.com/Disco-Dave/chat-server#readme
+bug-reports:    https://github.com/Disco-Dave/chat-server/issues
+author:         David Burkett
+maintainer:     david@davidburkett.xyz
+copyright:      2021 David Burkett
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/Disco-Dave/chat-server
+
+library
+  exposed-modules:
+      Chat
+      Chat.Config
+      Chat.Messages
+      Chat.NonEmptyText
+      Chat.Rooms
+      Chat.WebSockets
+  other-modules:
+      Paths_chat_server
+  hs-source-dirs:
+      src
+  default-extensions:
+      DerivingVia
+      DeriveGeneric
+      NamedFieldPuns
+      NumericUnderscores
+      OverloadedStrings
+      RecordWildCards
+      StrictData
+      TemplateHaskell
+      TupleSections
+      ViewPatterns
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fwrite-ide-info -hiedir=.hie
+  build-depends:
+      aeson
+    , async
+    , base >=4.7 && <5
+    , containers
+    , envparse
+    , exceptions
+    , katip
+    , load-env
+    , mtl
+    , stm
+    , text
+    , time
+    , unliftio-core
+    , uuid
+    , websockets
+  default-language: Haskell2010
+
+executable chat-server-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_chat_server
+  hs-source-dirs:
+      app
+  default-extensions:
+      DerivingVia
+      DeriveGeneric
+      NamedFieldPuns
+      NumericUnderscores
+      OverloadedStrings
+      RecordWildCards
+      StrictData
+      TemplateHaskell
+      TupleSections
+      ViewPatterns
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fwrite-ide-info -hiedir=.hie -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , async
+    , base >=4.7 && <5
+    , chat-server
+    , containers
+    , envparse
+    , exceptions
+    , katip
+    , load-env
+    , mtl
+    , stm
+    , text
+    , time
+    , unliftio-core
+    , uuid
+    , websockets
+  default-language: Haskell2010
+
+test-suite chat-server-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_chat_server
+  hs-source-dirs:
+      test
+  default-extensions:
+      DerivingVia
+      DeriveGeneric
+      NamedFieldPuns
+      NumericUnderscores
+      OverloadedStrings
+      RecordWildCards
+      StrictData
+      TemplateHaskell
+      TupleSections
+      ViewPatterns
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fwrite-ide-info -hiedir=.hie -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , async
+    , base >=4.7 && <5
+    , chat-server
+    , containers
+    , envparse
+    , exceptions
+    , katip
+    , load-env
+    , mtl
+    , stm
+    , text
+    , time
+    , unliftio-core
+    , uuid
+    , websockets
+  default-language: Haskell2010
