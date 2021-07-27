@@ -4,9 +4,9 @@ module Chat (
 
 import Chat.Config (Config (..), LoggingConfig (..))
 import qualified Chat.WebSockets as WebSockets
-import Control.Exception (bracket)
 import qualified Katip
 import System.IO (stdout)
+import qualified UnliftIO
 
 makeLogEnv :: LoggingConfig -> IO Katip.LogEnv
 makeLogEnv LoggingConfig{..} = do
@@ -29,13 +29,11 @@ makeLogEnv LoggingConfig{..} = do
 
 withLogger :: LoggingConfig -> Katip.KatipContextT IO () -> IO ()
 withLogger loggingConfig action =
-  bracket (makeLogEnv loggingConfig) Katip.closeScribes $ \logEnv -> do
+  UnliftIO.bracket (makeLogEnv loggingConfig) Katip.closeScribes $ \logEnv -> do
     Katip.runKatipContextT logEnv () "main" action
 
 run :: Config -> IO ()
-run config@Config{..} =
-  withLogger configLogging $
-    flip Katip.logExceptionM Katip.ErrorS $ do
-      Katip.katipAddContext (Katip.sl "config" config) $
-        $(Katip.logTM) Katip.DebugS "Starting application with the supplied configuration"
-      WebSockets.listen configWebSockets
+run config@Config{..} = withLogger configLogging . flip Katip.logExceptionM Katip.ErrorS $ do
+  Katip.katipAddContext (Katip.sl "config" config) $
+    $(Katip.logTM) Katip.DebugS "Starting application with the supplied configuration"
+  WebSockets.listen configWebSockets

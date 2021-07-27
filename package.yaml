@@ -31,31 +31,30 @@ ghc-options:
   - -hiedir=.hie
 
 default-extensions:
-  - DerivingVia
   - DeriveGeneric
+  - DerivingVia
   - NamedFieldPuns
-  - NumericUnderscores 
+  - NumericUnderscores
   - OverloadedStrings
   - RecordWildCards
   - StrictData
   - TemplateHaskell
   - TupleSections
+  - TypeApplications
   - ViewPatterns
 
 dependencies:
   - base >= 4.7 && < 5
   - aeson
-  - async
   - containers
   - envparse
-  - exceptions
   - katip
   - load-env
   - mtl
   - stm
   - text
   - time
-  - unliftio-core
+  - unliftio
   - uuid
   - websockets
 
@@ -83,3 +82,8 @@ tests:
       - -with-rtsopts=-N
     dependencies:
       - chat-server
+      - aeson-qq
+      - directory
+      - hspec
+      - port-utils
+      - silently
