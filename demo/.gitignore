@@ -9,6 +9,7 @@
 /.psa*
 /.spago/
 /.cache/
+/.parcel-cache/
 /.purs-repl
 /.psc-ide-port
 /dist/
