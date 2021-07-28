@@ -3,7 +3,13 @@
 module ChatSpec (spec) where
 
 import qualified Chat
-import Chat.Messages
+import Chat.Messages (
+  MessageText (fromMessageText),
+  OutputMessage (..),
+  User (User),
+  UserId,
+  UserName (UserName),
+ )
 import qualified Chat.NonEmptyText as NonEmptyText
 import qualified Data.Aeson as Aeson
 import Data.Aeson.QQ (aesonQQ)
@@ -13,7 +19,15 @@ import qualified Data.Text as Text
 import qualified Katip
 import qualified Network.Wai.Handler.Warp as Warp
 import qualified Network.WebSockets as WebSockets
-import Test.Hspec
+import Test.Hspec (
+  Spec,
+  around,
+  expectationFailure,
+  it,
+  shouldBe,
+  shouldNotBe,
+  shouldSatisfy,
+ )
 
 withServer :: (Warp.Port -> IO a) -> IO a
 withServer action = do
