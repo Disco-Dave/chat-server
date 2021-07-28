@@ -47,6 +47,7 @@ library
       TupleSections
       TypeApplications
       ViewPatterns
+      MultiWayIf
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fwrite-ide-info -hiedir=.hie
   build-depends:
       aeson
@@ -86,6 +87,7 @@ executable chat-server-exe
       TupleSections
       TypeApplications
       ViewPatterns
+      MultiWayIf
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fwrite-ide-info -hiedir=.hie -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -128,6 +130,7 @@ test-suite chat-server-test
       TupleSections
       TypeApplications
       ViewPatterns
+      MultiWayIf
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fwrite-ide-info -hiedir=.hie -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson

@@ -54,6 +54,12 @@ data User = User
   }
   deriving (Show, Eq)
 
+instance Aeson.FromJSON User where
+  parseJSON = Aeson.withObject "User" $ \o ->
+    User
+      <$> (o Aeson..: "id")
+      <*> (o Aeson..: "name")
+
 instance Aeson.ToJSON User where
   toJSON User{..} =
     Aeson.object ["id" Aeson..= userId, "name" Aeson..= userName]
@@ -110,6 +116,21 @@ userJoinedTag = "USER_JOINED"
 
 sentMessageTag :: Text
 sentMessageTag = "SENT_MESSAGE"
+
+instance Aeson.FromJSON OutputMessage where
+  parseJSON = Aeson.withObject "OutputMessage" $ \o -> do
+    messageType <- o Aeson..: "type"
+    if
+        | messageType == userLeftTag ->
+          UserLeftMessage <$> (o Aeson..: "user")
+        | messageType == userJoinedTag ->
+          UserJoinedMessage <$> (o Aeson..: "user")
+        | messageType == sentMessageTag ->
+          SentMessage
+            <$> (o Aeson..: "timestamp")
+            <*> (o Aeson..: "user")
+            <*> (o Aeson..: "message")
+        | otherwise -> fail "Unrecognized message type"
 
 instance Aeson.ToJSON OutputMessage where
   toJSON outputMessage =

@@ -23,7 +23,7 @@ import qualified UnliftIO.Async as Async
 getAnnouncement :: KatipContext m => WebSockets.Connection -> m (Maybe Announcement)
 getAnnouncement connection = do
   $(Katip.logTM) Katip.DebugS "Attempting to get announcement message"
-  message <- liftIO $ timeout 300_000_000 (WebSockets.receiveData connection)
+  message <- liftIO $ timeout 15_000_000 (WebSockets.receiveData connection)
   case fmap Aeson.decode message of
     Nothing -> do
       $(Katip.logTM) Katip.WarningS "Request to get announcement message timed out"
