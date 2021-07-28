@@ -13,9 +13,8 @@ import GHC.Generics (Generic)
 import qualified Katip
 import LoadEnv (loadEnv)
 
-data WebSocketsConfig = WebSocketsConfig
-  { webSocketsHost :: String
-  , webSocketsPort :: Int
+newtype WebSocketsConfig = WebSocketsConfig
+  { webSocketsPort :: Int
   }
   deriving (Show, Eq, Generic)
 instance ToJSON WebSocketsConfig
@@ -23,8 +22,7 @@ instance ToJSON WebSocketsConfig
 parseWebSocketsConfig :: Env.Parser Env.Error WebSocketsConfig
 parseWebSocketsConfig =
   WebSocketsConfig
-    <$> Env.var (Env.str <=< Env.nonempty) "WEB_SOCKETS_HOST" (Env.help "Hostname for the web sockets server to run on")
-    <*> Env.var Env.auto "WEB_SOCKETS_PORT" (Env.help "Port for the web sockets port to run on")
+    <$> Env.var Env.auto "WEB_SOCKETS_PORT" (Env.help "Port for the web sockets port to run on")
 
 data LoggingConfig = LoggingConfig
   { loggingFile :: FilePath

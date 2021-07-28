@@ -1,8 +1,7 @@
 module Chat.WebSockets (
-  listen,
+  app,
 ) where
 
-import Chat.Config (WebSocketsConfig (..))
 import Chat.Messages (Announcement (..), MessageText (..), User (..), UserId (..))
 import qualified Chat.NonEmptyText as NonEmptyText
 import Chat.Rooms (Rooms)
@@ -83,10 +82,10 @@ logException =
         throwIO e
    in handleAny handler
 
-serverApp :: (KatipContext m, MonadUnliftIO m) => Rooms -> WebSockets.PendingConnection -> m ()
-serverApp rooms pendingConnection = do
-  connectionId <- liftIO UUID.nextRandom
-  Katip.katipAddContext (Katip.sl "connectionId" connectionId) . logException $ do
+app :: (KatipContext m, MonadUnliftIO m) => Rooms -> WebSockets.PendingConnection -> m ()
+app rooms pendingConnection = do
+  context <- Katip.sl "connectionId" <$> liftIO UUID.nextRandom
+  logException . Katip.katipAddContext context . Katip.katipAddNamespace "web-sockets" $ do
     connection <- liftIO $ WebSockets.acceptRequest pendingConnection
     withRunInIO $ \runInIO ->
       WebSockets.withPingThread connection 30 (pure ()) $
@@ -100,22 +99,3 @@ serverApp rooms pendingConnection = do
               pure ()
             Just announcement ->
               handleAnnouncement rooms connection announcement
-
-listen :: (KatipContext m, MonadUnliftIO m) => WebSocketsConfig -> m ()
-listen WebSocketsConfig{..} = Katip.katipAddNamespace "web-sockets" $ do
-  let message =
-        mconcat
-          [ "Listening for websockets on host "
-          , Katip.showLS webSocketsHost
-          , " and port "
-          , Katip.showLS webSocketsPort
-          ]
-   in $(Katip.logTM) Katip.InfoS message
-
-  rooms <- Rooms.initialize
-
-  withRunInIO $ \runInIO ->
-    WebSockets.runServer
-      webSocketsHost
-      webSocketsPort
-      (runInIO . serverApp rooms)

@@ -48,6 +48,7 @@ dependencies:
   - aeson
   - containers
   - envparse
+  - http-types
   - katip
   - load-env
   - mtl
@@ -56,6 +57,9 @@ dependencies:
   - time
   - unliftio
   - uuid
+  - wai
+  - wai-websockets
+  - warp
   - websockets
 
 library:
@@ -83,7 +87,4 @@ tests:
     dependencies:
       - chat-server
       - aeson-qq
-      - directory
       - hspec
-      - port-utils
-      - silently
