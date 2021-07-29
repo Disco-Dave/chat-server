@@ -12,7 +12,8 @@ to generate this file without the comments in this block.
 -}
 { name = "demo-chat"
 , dependencies =
-  [ "console"
+  [ "argonaut-codecs"
+  , "console"
   , "effect"
   , "exceptions"
   , "maybe"
@@ -20,8 +21,9 @@ to generate this file without the comments in this block.
   , "psci-support"
   , "react-basic-dom"
   , "react-basic-hooks"
-  , "web-html"
   , "web-dom"
+  , "web-html"
+  , "web-socket"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

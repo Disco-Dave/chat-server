@@ -1,21 +1,16 @@
-module Main where
+module Main (main) where
 
 import Prelude
 import Data.Maybe (maybe)
 import Effect (Effect)
 import Effect.Exception (throw)
 import React.Basic.DOM as R
-import React.Basic.Hooks as React
 import Web.DOM (Element)
 import Web.DOM.NonElementParentNode (getElementById)
 import Web.HTML as HTML
 import Web.HTML.HTMLDocument (toNonElementParentNode)
 import Web.HTML.Window as Window
-
-mkApp :: React.Component Unit
-mkApp =
-  React.component "App" \_ -> React.do
-    pure $ R.h1_ [ R.text "Hello world" ]
+import App (mkApp)
 
 getAppElement :: Effect Element
 getAppElement = do
