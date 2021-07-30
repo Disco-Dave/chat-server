@@ -2,6 +2,7 @@ module Hooks.UseRoom
   ( Announcement
   , User
   , RoomEvent(..)
+  , useRoom
   ) where
 
 import Prelude
@@ -15,6 +16,7 @@ import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import React.Basic.Hooks (type (/\), (/\))
 import React.Basic.Hooks as Hooks
+import Web.Socket.WebSocket as WebSocket
 
 newtype ServerTimestamp
   = ServerTimestamp DateTime
@@ -95,7 +97,18 @@ type State
 initialState :: State
 initialState = { userId: Nothing, events: [] }
 
-useRoom :: Announcement -> 
-useRoom announcement = do
-  state /\ setState <- Hooks.useState { userId: Nothing, events: [] }
-  pure unit
+useRoom announcement = Hooks.do
+  state /\ setState <- Hooks.useState initialState
+
+  Hooks.useEffect announcement do
+    webSocket <- WebSocket.create "ws://localhost/api/" []
+    -- TODO: Add a listener for onOpen to send initial message
+    -- TODO: Add a listener for receiving messages
+    pure $ WebSocket.close webSocket
+
+  -- TODO: Add a function to send messages
+  -- TODO: Add a property that informs the consumer of the state of the connection
+  pure
+    { userId: state.userId
+    , events: state.events
+    }
