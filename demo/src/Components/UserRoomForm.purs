@@ -68,13 +68,16 @@ mkUserRoomForm =
         state /\ setState <- Hooks.useState initialState
         let
           handleSubmit =
-            Events.handler preventDefault \_ ->
-              if hasErrors state then
+            Events.handler preventDefault \_ -> do
+              let
+                newState = blurRoom $ blurUser state
+              setState $ const newState
+              if hasErrors newState then
                 pure unit
               else
                 props.onSubmit
-                  { room: state.room.value
-                  , user: state.user.value
+                  { room: newState.room.value
+                  , user: newState.user.value
                   }
         pure
           $ R.form

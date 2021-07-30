@@ -13,9 +13,12 @@ to generate this file without the comments in this block.
 { name = "demo-chat"
 , dependencies =
   [ "argonaut-codecs"
+  , "argonaut-core"
   , "console"
+  , "control"
   , "datetime"
   , "effect"
+  , "either"
   , "exceptions"
   , "formatters"
   , "lists"
