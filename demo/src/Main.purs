@@ -10,7 +10,7 @@ import Web.DOM.NonElementParentNode (getElementById)
 import Web.HTML as HTML
 import Web.HTML.HTMLDocument (toNonElementParentNode)
 import Web.HTML.Window as Window
-import App (mkApp)
+import Components.App (mkApp)
 
 getAppElement :: Effect Element
 getAppElement = do
