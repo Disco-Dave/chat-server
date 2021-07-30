@@ -2,9 +2,12 @@ module Components.UserRoomForm where
 
 import Prelude
 import Components.TextFieldInput (textFieldInput)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), isJust)
 import Data.String as String
+import Effect (Effect)
 import React.Basic.DOM as R
+import React.Basic.DOM.Events (preventDefault)
+import React.Basic.Events as Events
 import React.Basic.Hooks ((/\))
 import React.Basic.Hooks as Hooks
 
@@ -52,14 +55,31 @@ changeUser newValue state = state { user = changeTextField newValue state.user }
 blurUser :: State -> State
 blurUser state = state { user = blurTextField state.user }
 
-mkUserRoomForm :: Hooks.Component Unit
+hasErrors :: State -> Boolean
+hasErrors state = isJust state.room.error || isJust state.user.error
+
+type Props
+  = { onSubmit :: { room :: String, user :: String } -> Effect Unit }
+
+mkUserRoomForm :: Hooks.Component Props
 mkUserRoomForm =
   Hooks.component "UserRoomForm"
-    $ \_ -> Hooks.do
+    $ \props -> Hooks.do
         state /\ setState <- Hooks.useState initialState
+        let
+          handleSubmit =
+            Events.handler preventDefault \_ ->
+              if hasErrors state then
+                pure unit
+              else
+                props.onSubmit
+                  { room: state.room.value
+                  , user: state.user.value
+                  }
         pure
           $ R.form
               { className: "form"
+              , onSubmit: handleSubmit
               , children:
                   [ textFieldInput
                       { id: "user-name"
@@ -76,6 +96,25 @@ mkUserRoomForm =
                       , error: state.room.error
                       , onBlur: setState blurRoom
                       , onChange: setState <<< changeRoom
+                      }
+                  , R.div
+                      { className: "buttons"
+                      , children:
+                          [ R.button
+                              { className: "button"
+                              , id: "join-room"
+                              , type: "submit"
+                              , children: [ R.text "Join" ]
+                              , onClick: handleSubmit
+                              }
+                          , R.button
+                              { className: "button button--danger"
+                              , id: "reset-form"
+                              , type: "reset"
+                              , children: [ R.text "Reset" ]
+                              , onClick: Events.handler_ (setState \_ -> initialState)
+                              }
+                          ]
                       }
                   ]
               }
