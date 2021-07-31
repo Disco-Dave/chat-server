@@ -7,14 +7,16 @@ module Hooks.UseRoom
 
 import Prelude
 import Control.Alternative ((<|>))
+import Data.Argonaut.Core (stringify)
 import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError(..), decodeJson, getField)
+import Data.Argonaut.Encode (encodeJson)
 import Data.DateTime (DateTime)
 import Data.Either (Either(..))
 import Data.Formatter.DateTime (Formatter, FormatterCommand(..), unformat)
 import Data.List (List(..), (:))
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
-import React.Basic.Hooks (type (/\), (/\))
+import React.Basic.Hooks (type (/\), Render, UseEffect, UseState, Hook, (/\))
 import React.Basic.Hooks as Hooks
 import Web.Socket.WebSocket as WebSocket
 
@@ -97,18 +99,49 @@ type State
 initialState :: State
 initialState = { userId: Nothing, events: [] }
 
+type Room
+  = { events :: Array RoomEvent
+    , sendMessage :: String -> Effect Unit
+    , userId :: Maybe String
+    }
+
+type UseRoom
+  = Hook (UseEffect Announcement) Room
+
+--useRoom :: Announcement -> UseRoom
+useRoom ::
+  forall hooks.
+  Announcement ->
+  Render hooks
+    ( UseEffect Announcement
+        ( UseState (String -> Effect Unit)
+            ( UseState
+                { events :: Array RoomEvent
+                , userId :: Maybe String
+                }
+                hooks
+            )
+        )
+    )
+    { events :: Array RoomEvent
+    , sendMessage :: String -> Effect Unit
+    , userId :: Maybe String
+    }
 useRoom announcement = Hooks.do
   state /\ setState <- Hooks.useState initialState
-
+  sendMessage /\ setSendMessage <- Hooks.useState' (\_ -> pure unit)
   Hooks.useEffect announcement do
     webSocket <- WebSocket.create "ws://localhost/api/" []
-    -- TODO: Add a listener for onOpen to send initial message
+    -- TODO: Add a lit49stener for onOpen to send initial message
     -- TODO: Add a listener for receiving messages
-    pure $ WebSocket.close webSocket
-
-  -- TODO: Add a function to send messages
+    setSendMessage \msg ->
+      WebSocket.sendString webSocket (stringify (encodeJson msg))
+    pure do
+      setSendMessage \_ -> pure unit
+      WebSocket.close webSocket
   -- TODO: Add a property that informs the consumer of the state of the connection
   pure
     { userId: state.userId
     , events: state.events
+    , sendMessage
     }

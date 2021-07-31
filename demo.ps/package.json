@@ -1,0 +1,27 @@
+{
+    "name": "demo-chat",
+    "version": "1.0.0",
+    "description": "Demo client for chat-server",
+    "scripts": {
+        "docs": "spago docs",
+        "clean": "rm -rf .parcel-cache .spago dist node_modules output .cache",
+        "build": "rm -rf dist && spago build",
+        "serve": "npm run build && parcel web/index.html",
+        "bundle:spago": "spago bundle-module -m Main -t output/bundled.js",
+        "bundle:parcel": "parcel build --no-source-maps web/index.html",
+        "bundle": "rm -rf dist && npm run bundle:spago && npm run bundle:parcel"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "parcel": "^2.0.0-beta.2",
+        "purescript": "^0.14.3",
+        "purescript-psa": "^0.8.2",
+        "spago": "^0.20.3"
+    },
+    "dependencies": {
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2"
+    }
+}
