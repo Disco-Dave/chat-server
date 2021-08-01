@@ -4,35 +4,24 @@ import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import TextFieldInput exposing (textFieldInput)
+import Pages.SelectRoom as SelectRoom
 
 
 type alias Flags =
     ()
 
 
-type alias Model =
-    { user : { value : String, error : Maybe String }
-    , room : { value : String, error : Maybe String }
-    }
+type Model
+    = SelectRoomModel SelectRoom.Model
 
 
 type Msg
-    = UserChanged String
-    | UserBlurred
-    | RoomChanged String
-    | RoomBlurred
-    | FormReset
-    | FormSubmitted
+    = SelectRoomMsg SelectRoom.Msg
 
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { user = { value = "", error = Nothing }
-      , room = { value = "", error = Nothing }
-      }
-    , Cmd.none
-    )
+    ( SelectRoomModel SelectRoom.init, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -40,123 +29,29 @@ subscriptions _ =
     Sub.none
 
 
-validate : { m | value : String, error : Maybe String } -> { m | value : String, error : Maybe String }
-validate model =
-    let
-        value =
-            String.trim model.value
-
-        error =
-            if String.isEmpty value then
-                Just "May not be empty"
-
-            else
-                Nothing
-    in
-    { model | error = error, value = value }
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        RoomChanged newValue ->
+    case ( msg, model ) of
+        ( SelectRoomMsg pageMsg, SelectRoomModel pageModel ) ->
             let
-                oldRoom =
-                    model.room
-
-                newRoom =
-                    { oldRoom | value = newValue }
-            in
-            ( { model | room = newRoom }
-            , Cmd.none
-            )
-
-        RoomBlurred ->
-            ( { model | room = validate model.room }
-            , Cmd.none
-            )
-
-        UserChanged newValue ->
-            let
-                oldUser =
-                    model.user
-
-                newUser =
-                    { oldUser | value = newValue }
-            in
-            ( { model | user = newUser }
-            , Cmd.none
-            )
-
-        UserBlurred ->
-            ( { model | user = validate model.user }
-            , Cmd.none
-            )
-
-        FormReset ->
-            ( { model
-                | user = { value = "", error = Nothing }
-                , room = { value = "", error = Nothing }
-              }
-            , Cmd.none
-            )
-
-        FormSubmitted ->
-            let
-                newModel =
-                    { model
-                        | user = validate model.user
-                        , room = validate model.room
-                    }
+                ( newModel, _ ) =
+                    Tuple.mapFirst SelectRoomModel (SelectRoom.update pageMsg pageModel)
             in
             ( newModel, Cmd.none )
 
 
+mapDocument : (msg -> Msg) -> Browser.Document msg -> Browser.Document Msg
+mapDocument mapper { title, body } =
+    { title = title
+    , body = List.map (Html.map mapper) body
+    }
+
+
 view : Model -> Browser.Document Msg
 view model =
-    { title = "Chat Server"
-    , body =
-        [ main_ [ class "layout" ]
-            [ h1 [ class "layout__title" ] [ text "Join a Room" ]
-            , div [ class "layout__body" ]
-                [ Html.form [ class "form", onSubmit FormSubmitted ]
-                    [ textFieldInput
-                        { id = "user-name"
-                        , label = "User"
-                        , value = model.user.value
-                        , error = model.user.error
-                        , onBlur = UserBlurred
-                        , onInput = UserChanged
-                        }
-                    , textFieldInput
-                        { id = "room-name"
-                        , label = "Room"
-                        , value = model.room.value
-                        , error = model.room.error
-                        , onBlur = RoomBlurred
-                        , onInput = RoomChanged
-                        }
-                    , div [ class "buttons" ]
-                        [ button
-                            [ class "button"
-                            , id "join-room"
-                            , type_ "submit"
-                            , onClick FormSubmitted
-                            ]
-                            [ text "Join" ]
-                        , button
-                            [ class "button button--danger"
-                            , id "reset-room"
-                            , type_ "reset"
-                            , onClick FormReset
-                            ]
-                            [ text "Reset" ]
-                        ]
-                    ]
-                ]
-            ]
-        ]
-    }
+    case model of
+        SelectRoomModel pageModel ->
+            mapDocument SelectRoomMsg (SelectRoom.view pageModel)
 
 
 main : Program Flags Model Msg
