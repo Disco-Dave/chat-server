@@ -1,7 +1,7 @@
 module Pages.SelectRoom exposing
     ( Model
     , Msg
-    , OutMsg
+    , OutMsg(..)
     , init
     , update
     , view
