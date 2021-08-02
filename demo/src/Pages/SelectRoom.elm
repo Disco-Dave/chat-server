@@ -8,10 +8,7 @@ module Pages.SelectRoom exposing
     )
 
 import Browser exposing (Document)
-import Html as H
-import Html.Attributes as A
-import Html.Events as E
-import SharedViews exposing (layout, textField)
+import SharedViews as S
 
 
 type alias Model =
@@ -38,6 +35,7 @@ init =
     { user = { value = "", error = Nothing }
     , room = { value = "", error = Nothing }
     }
+
 
 validate : { m | value : String, error : Maybe String } -> { m | value : String, error : Maybe String }
 validate model =
@@ -121,9 +119,9 @@ update msg model =
 
 view : Model -> Document Msg
 view model =
-    layout "Join a Room"
-        [ H.form [ A.class "form", E.onSubmit FormSubmitted ]
-            [ textField
+    S.layout "Join a Room"
+        [ S.form FormSubmitted
+            [ S.textField
                 { id = "user-name"
                 , label = "User"
                 , value = model.user.value
@@ -131,7 +129,7 @@ view model =
                 , onBlur = UserBlurred
                 , onInput = UserChanged
                 }
-            , textField
+            , S.textField
                 { id = "room-name"
                 , label = "Room"
                 , value = model.room.value
@@ -139,20 +137,16 @@ view model =
                 , onBlur = RoomBlurred
                 , onInput = RoomChanged
                 }
-            , H.div [ A.class "buttons" ]
-                [ H.button
-                    [ A.class "button"
-                    , A.id "join-room"
-                    , A.type_ "submit"
-                    ]
-                    [ H.text "Join" ]
-                , H.button
-                    [ A.class "button button--danger"
-                    , A.id "reset-room"
-                    , A.type_ "reset"
-                    , E.onClick FormReset
-                    ]
-                    [ H.text "Reset" ]
+            , S.buttons
+                [ S.submitButton
+                    { id = "join-room"
+                    , text = "Join"
+                    }
+                , S.resetButton
+                    { id = "reset-room"
+                    , text = "Reset"
+                    , onClick = FormReset
+                    }
                 ]
             ]
         ]

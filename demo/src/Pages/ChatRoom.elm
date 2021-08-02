@@ -11,10 +11,9 @@ module Pages.ChatRoom exposing
 import Browser exposing (Document)
 import Html as H
 import Html.Attributes as A
-import Html.Events as E
 import Json.Decode as Decode
 import RoomConnection
-import SharedViews exposing (layout, textField)
+import SharedViews as S
 import Task
 import Time exposing (Posix, Zone)
 
@@ -241,11 +240,11 @@ viewEvent localZone event =
 
 view : Model -> Document Msg
 view model =
-    layout model.room
-        [ H.form [ A.class "form", E.onSubmit MessageSent ]
+    S.layout model.room
+        [ S.form MessageSent
             [ H.div [ A.class "messages" ]
                 (List.map (viewEvent model.localTimeZone) model.receivedEvents)
-            , textField
+            , S.textField
                 { id = "message"
                 , label = "Send a message"
                 , value = model.message
@@ -253,20 +252,17 @@ view model =
                 , onBlur = MessageBlurred
                 , onInput = MessageChanged
                 }
-            , H.div [ A.class "buttons" ]
-                [ H.button
-                    [ A.class "button"
-                    , A.id "send-message"
-                    , A.type_ "submit"
-                    ]
-                    [ H.text "Send" ]
-                , H.button
-                    [ A.class "button button--danger"
-                    , A.id "leave"
-                    , A.type_ "button"
-                    , E.onClick LeaveRequested
-                    ]
-                    [ H.text "Leave" ]
+            , S.buttons
+                [ S.submitButton
+                    { id = "send-message"
+                    , text = "Send"
+                    }
+                , S.button
+                    { id = "leave"
+                    , text = "Leave"
+                    , onClick = LeaveRequested
+                    , isDangerous = True
+                    }
                 ]
             ]
         ]

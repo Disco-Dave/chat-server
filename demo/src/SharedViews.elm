@@ -1,9 +1,17 @@
 module SharedViews exposing
-    ( FieldModel
+    ( ButtonModel
+    , FieldModel
+    , ResetButton
+    , SubmitButton
     , TextFieldModel
+    , button
+    , buttons
     , field
     , layout
+    , resetButton
+    , submitButton
     , textField
+    , form
     )
 
 import Browser exposing (Document)
@@ -85,3 +93,93 @@ textField model =
             ]
             []
 
+
+type alias ButtonModel_ msg =
+    { id : String
+    , text : String
+    , type_ : String
+    , onClick : Maybe msg
+    , isDangerious : Bool
+    }
+
+
+button_ : ButtonModel_ msg -> Html msg
+button_ model =
+    H.button
+        ([ A.classList [ ( "button", True ), ( "button--danger", model.isDangerious ) ]
+         , A.id model.id
+         , A.type_ model.type_
+         ]
+            ++ (case model.onClick of
+                    Nothing ->
+                        []
+
+                    Just e ->
+                        [ E.onClick e ]
+               )
+        )
+        [ H.text model.text ]
+
+
+type alias SubmitButton =
+    { id : String
+    , text : String
+    }
+
+
+submitButton : SubmitButton -> Html msg
+submitButton model =
+    button_
+        { id = model.id
+        , text = model.text
+        , type_ = "submit"
+        , onClick = Nothing
+        , isDangerious = False
+        }
+
+
+type alias ResetButton msg =
+    { id : String
+    , text : String
+    , onClick : msg
+    }
+
+
+resetButton : ResetButton msg -> Html msg
+resetButton model =
+    button_
+        { id = model.id
+        , text = model.text
+        , type_ = "reset"
+        , onClick = Just model.onClick
+        , isDangerious = True
+        }
+
+
+type alias ButtonModel msg =
+    { id : String
+    , text : String
+    , onClick : msg
+    , isDangerous : Bool
+    }
+
+
+button : ButtonModel msg -> Html msg
+button model =
+    button_
+        { id = model.id
+        , text = model.text
+        , type_ = "button"
+        , onClick = Just model.onClick
+        , isDangerious = model.isDangerous
+        }
+
+
+buttons : List (Html msg) -> Html msg
+buttons children =
+    H.div [ A.class "buttons" ] children
+
+
+form : msg -> List (Html msg) -> Html msg
+form onSubmit children =
+    H.form [ A.class "form", E.onSubmit onSubmit ] children
