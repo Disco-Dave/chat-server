@@ -9,7 +9,7 @@ module Pages.ChatRoom exposing
     )
 
 import Browser exposing (Document)
-import Html as H
+import Html as H exposing (Html)
 import Html.Attributes as A
 import Json.Decode as Decode
 import RoomConnection
@@ -215,35 +215,71 @@ displayTimestamp localZone timestamp =
     month ++ "/" ++ day ++ "/" ++ year ++ " " ++ hour ++ ":" ++ minutes ++ ":" ++ seconds
 
 
-viewEvent : Zone -> ReceivedEvent -> H.Html msg
+viewUserLeft : RoomConnection.User -> Html msg
+viewUserLeft user =
+    H.div [ A.class "user-event user-event--left" ]
+        [ H.text user.name ]
+
+
+viewUserJoined : RoomConnection.User -> Html msg
+viewUserJoined user =
+    H.div [ A.class "user-event user-event--joined" ]
+        [ H.text user.name ]
+
+
+viewMessage : Zone -> Posix -> RoomConnection.User -> RoomConnection.MessageText -> Html msg
+viewMessage localZone timestamp user message =
+    H.article [ A.class "message" ]
+        [ H.header [ A.class "message__header" ]
+            [ H.span [ A.class "message__user" ] [ H.text user.name ]
+            , H.span [ A.class "message__timestamp" ] [ H.text (displayTimestamp localZone timestamp) ]
+            ]
+        , H.p [ A.class "message__body" ] [ H.text message ]
+        ]
+
+
+viewEvent : Zone -> ReceivedEvent -> Html msg
 viewEvent localZone event =
     case event of
         UserJoined user ->
-            H.p [ A.class "user-event user-event--joined" ]
-                [ H.span [ A.class "user-event__name" ] [ H.text user.name ]
-                ]
+            viewUserJoined user
 
         UserLeft user ->
-            H.p [ A.class "user-event user-event--left" ]
-                [ H.span [ A.class "user-event__name" ] [ H.text user.name ]
-                ]
+            viewUserLeft user
 
         MessageReceived timestamp user message ->
-            H.article [ A.class "message" ]
-                [ H.header [ A.class "message__header" ]
-                    [ H.span [ A.class "message__user" ] [ H.text user.name ]
-                    , H.span [ A.class "message__timestamp" ] [ H.text (displayTimestamp localZone timestamp) ]
-                    ]
-                , H.p [ A.class "message__body" ] [ H.text message ]
-                ]
+            viewMessage localZone timestamp user message
+
+
+viewEvents : Zone -> List ReceivedEvent -> List (Html msg)
+viewEvents localZone =
+    List.map (viewEvent localZone)
+
+
+viewStatus : ConnectionStatus -> Html msg
+viewStatus status =
+    case status of
+        PendingConnection ->
+            H.p [ A.class "status" ] [ H.text "Connecting..." ]
+
+        Connected ->
+            H.p [ A.class "status status--ok" ] [ H.text "Connected" ]
+
+        FailedToConnect ->
+            H.p [ A.class "status status--bad" ] [ H.text "Failed to connect" ]
+
+        Disconnected ->
+            H.p [ A.class "status" ] [ H.text "Disconnected" ]
 
 
 view : Model -> Document Msg
 view model =
     S.layout model.room
         [ S.form MessageSent
-            [ H.div [ A.class "messages" ]
-                (List.map (viewEvent model.localTimeZone) model.receivedEvents)
+            [ H.div [ A.class "room" ]
+                [ viewStatus model.connectionStatus
+                , H.div [ A.class "events" ] (viewEvents model.localTimeZone model.receivedEvents)
+                ]
             , S.textField
                 { id = "message"
                 , label = "Send a message"
