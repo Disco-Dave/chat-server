@@ -23,6 +23,11 @@ source-repository head
   type: git
   location: https://github.com/Disco-Dave/chat-server
 
+flag static
+  description: Pass -static/-pthread to ghc when linking the connect-four-web-exe binary.
+  manual: True
+  default: False
+
 library
   exposed-modules:
       Chat
@@ -108,6 +113,8 @@ executable chat-server-exe
     , wai-websockets
     , warp
     , websockets
+  if flag(static)
+    ld-options: -static -pthread
   default-language: Haskell2010
 
 test-suite chat-server-test

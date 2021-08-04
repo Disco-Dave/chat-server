@@ -76,6 +76,11 @@ executables:
       - -with-rtsopts=-N
     dependencies:
       - chat-server
+    when:
+    - condition: flag(static)
+      ld-options:
+      - -static
+      - -pthread
 
 tests:
   chat-server-test:
@@ -89,3 +94,9 @@ tests:
       - chat-server
       - aeson-qq
       - hspec
+
+flags:
+  static:
+    description: Pass -static/-pthread to ghc when linking the connect-four-web-exe binary.
+    manual: true
+    default: false
