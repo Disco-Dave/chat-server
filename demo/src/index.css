@@ -133,4 +133,71 @@ body {
   box-shadow: 0px 0px 0.125rem 0.125rem hsl(193, 43%, 67%, 0.35);
 }
 
+.room {
+  padding: 1rem;
+  border: 0.125rem solid var(--nord-polar-night-4);
+  border-radius: 0.125rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  height: 30rem;
+  overflow: auto;
+}
 
+.status {
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+.status--ok {
+  color: var(--nord-aurora-green);
+}
+
+.status--bad {
+  color: var(--nord-aurora-red);
+}
+
+.events {
+  display: flex;
+  flex-direction: column;
+  flex-flow: column-reverse;
+}
+
+.message, .user-event {
+  margin-top: 1rem;
+}
+
+.message__header, .user-event {
+  font-weight: 600;
+}
+
+.message__header::after {
+  content: ":";
+}
+
+.message__user {
+  margin-right: 0.25rem;
+}
+
+.message__timestamp::before {
+  content: "(";
+}
+
+.message__timestamp::after {
+  content: ")";
+}
+
+.message__body {
+  margin: 0;
+  margin-top: 0.125rem;
+}
+
+.user-event--joined::after {
+  content: " joined"
+
+}
+
+.user-event--left::after {
+  content: " left"
+}

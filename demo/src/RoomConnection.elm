@@ -95,7 +95,7 @@ decodeEvent =
                         Decode.map3 SentMessage
                             (Decode.field "timestamp" Iso8601.decoder)
                             (Decode.field "user" decodeUser)
-                            (Decode.field "message" Decode.string)
+                            (Decode.field "message" (Decode.map (String.dropLeft 1 >> String.dropRight 1) Decode.string))
 
                     _ ->
                         Decode.fail (messageType ++ " is not a recognized type.")
