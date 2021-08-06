@@ -9,6 +9,7 @@ module Pages.ChatRoom exposing
     )
 
 import Browser exposing (Document)
+import Browser.Dom as Dom
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Json.Decode as Decode
@@ -49,6 +50,7 @@ type Msg
     | MessageBlurred
     | LeaveRequested
     | GotLocalTimeZone Zone
+    | ScrolledToBottom
 
 
 type OutMsg
@@ -75,6 +77,13 @@ init { user, room } =
 subscriptions : Sub Msg
 subscriptions =
     Sub.map ReceivedRoomEvent RoomConnection.subscribe
+
+
+scrollToBottomOfRoom : Cmd Msg
+scrollToBottomOfRoom =
+    Dom.getViewportOf "room"
+        |> Task.andThen (\info -> Dom.setViewportOf "room" 0 info.scene.height)
+        |> Task.attempt (\_ -> ScrolledToBottom)
 
 
 update : Msg -> Model -> ( Model, Maybe OutMsg, Cmd Msg )
@@ -137,22 +146,25 @@ update msg model =
                 RoomConnection.UserLeftMessage user ->
                     ( { model | receivedEvents = UserLeft user :: model.receivedEvents }
                     , Nothing
-                    , Cmd.none
+                    , scrollToBottomOfRoom
                     )
 
                 RoomConnection.UserJoinedMessage user ->
                     ( { model | receivedEvents = UserJoined user :: model.receivedEvents }
                     , Nothing
-                    , Cmd.none
+                    , scrollToBottomOfRoom
                     )
 
                 RoomConnection.SentMessage time user text ->
                     ( { model | receivedEvents = MessageReceived time user text :: model.receivedEvents }
                     , Nothing
-                    , Cmd.none
+                    , scrollToBottomOfRoom
                     )
 
         ReceivedRoomEvent (Err _) ->
+            ( model, Nothing, Cmd.none )
+
+        ScrolledToBottom ->
             ( model, Nothing, Cmd.none )
 
 
@@ -276,7 +288,7 @@ view : Model -> Document Msg
 view model =
     S.layout model.room
         [ S.form MessageSent
-            [ H.div [ A.class "room" ]
+            [ H.div [ A.class "room", A.id "room" ]
                 [ viewStatus model.connectionStatus
                 , H.div [ A.class "events" ] (viewEvents model.localTimeZone model.receivedEvents)
                 ]
